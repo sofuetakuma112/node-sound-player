@@ -45,14 +45,6 @@ function App() {
   useEffect(() => {
     // イベントリスナーを設定して、soundPlayedイベントが来たらAnimateコンポーネントを追加する
     socket.on("soundPlayed", () => {
-      // setAnimations((prevAnimations) => [
-      //   ...prevAnimations,
-      //   <Animate
-      //     key={Date.now()}
-      //     startXPosition={getWidthPercentage(width, getRandomNumber(-40, 40))}
-      //     imgSrc={getRandomImage(images)}
-      //   />,
-      // ]);
       const animationContainer = document.getElementById("animation-container");
       if (animationContainer && animationContainer.children.length <= 20) {
         setAnimations((prevAnimations) => [

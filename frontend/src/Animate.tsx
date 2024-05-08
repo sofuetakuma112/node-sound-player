@@ -33,7 +33,7 @@ const Animate = ({ imgSrc, startXPosition }: AnimateProps) => {
         "w-full h-screen flex overflow-hidden items-end justify-center absolute top-0 left-0"
       )}
     >
-      <div className="size-10 sm:size-16 relative top-10 sm:top-16" ref={wrapperRef}>
+      <div className="size-10 sm:size-16 relative top-12 sm:top-24" ref={wrapperRef}>
         <img
           src={imgSrc}
           className="block select-none size-full object-cover"

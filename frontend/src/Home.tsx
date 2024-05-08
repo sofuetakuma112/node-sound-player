@@ -6,17 +6,17 @@ import Animate from "./Animate";
 const socket = io(`${import.meta.env.VITE_SERVER_URL!}`);
 
 const images = [
-  "https://contents.oricon.co.jp/upimg/news/2280000/2279726/20230519_185239_p_o_62324597.jpg",
-  "https://pbs.twimg.com/media/Fid2xn1akAYW3mt.jpg:large",
-  "https://pbs.twimg.com/media/FgyQo7bacAANOJ-.jpg:large",
-  "https://pbs.twimg.com/media/FgOGD2kUcAAmXKO.jpg:large",
-  "https://img-mdpr.freetls.fastly.net/article/pyg4/nm/pyg4aX6UlPTvhpKa5evj_lCBFVd4RVasH0zLwqB1hcU.jpg",
-  "https://img.cdn.nimg.jp/s/nicovideo/thumbnails/41395681/41395681.57120664.original/r1280x720l?key=b09cc8349080d19671e2785399938f9f37eac7759ed47427a9565f78719dccda",
-  "https://cdn-ak.f.st-hatena.com/images/fotolife/k/kinekun/20221106/20221106124936.jpg",
-  "https://newstisiki.com/wp-content/uploads/2022/10/589c1406930fea6aba23c6828ad35004.jpg",
-  "https://www.entax.news/wp-content/uploads/2023/11/1-1.jpg.webp",
-  "https://contents.oricon.co.jp/upimg/news/2231000/2230959/20220407_181329_p_o_1752.jpg",
-  "https://アイレビュー.com/wp-content/uploads/2022/04/2022-04-10-4-890x500.png",
+  "/images/1.webp",
+  "/images/2.webp",
+  "/images/3.webp",
+  "/images/4.webp",
+  "/images/5.webp",
+  "/images/6.webp",
+  "/images/7.webp",
+  "/images/8.webp",
+  "/images/9.webp",
+  "/images/10.webp",
+  "/images/11.webp",
 ];
 
 function getWidthPercentage(currentWidth: number, percentage: number) {

@@ -3,7 +3,7 @@ import axios from "axios"
 function App() {
   const handlePlaySound = async () => {
     try {
-      await axios.post("http://localhost:3000/play-sound");
+      await axios.post(`${import.meta.env.VITE_SERVER_URL!}/play-sound`);
       console.log("Sound played successfully");
     } catch (error) {
       console.error("Error playing sound:", error);

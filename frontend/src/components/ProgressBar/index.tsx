@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { useEffect, useState } from "react";
 
 const generateColorArray = (steps: number): string[] => {
@@ -16,10 +17,11 @@ const generateColorArray = (steps: number): string[] => {
 
 type Props = {
   value: number;
+  className?: string;
 };
 
 export const ProgressBar = (props: Props) => {
-  const { value } = props;
+  const { value, className } = props;
   const [barCount, setBarCount] = useState(0);
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export const ProgressBar = (props: Props) => {
     const screenWidth = window.innerWidth;
     const maxHeight = screenWidth >= 640 ? 100 : 64;
     const minHeight = screenWidth >= 640 ? 60 : 20;
-    const power = screenWidth >= 640 ? 1.8 : 1.4 // 増分の増加率を調整するための指数
+    const power = screenWidth >= 640 ? 1.8 : 1.4; // 増分の増加率を調整するための指数
 
     const normalizedIndex = index / (bars.length - 1);
     const height = maxHeight * Math.pow(normalizedIndex, power) + minHeight;
@@ -54,7 +56,12 @@ export const ProgressBar = (props: Props) => {
   };
 
   return (
-    <div className="flex justify-center gap-x-1 sm:gap-4 items-end relative z-30">
+    <div
+      className={clsx(
+        "flex justify-center gap-x-1 sm:gap-4 items-end relative z-30",
+        className
+      )}
+    >
       {bars.map((bar, i) => {
         const coloredBarLength = (value / 100) * bars.length;
         const isColoredBar = i < coloredBarLength - 1;

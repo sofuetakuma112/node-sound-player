@@ -33,20 +33,6 @@ function getRandomImage(images: string[]): string {
   return images[randomIndex];
 }
 
-const generateColorArray = (steps: number): string[] => {
-  const colorArray: string[] = [];
-  const orangeValue = 165;
-  const step = Math.floor(orangeValue / (steps - 1));
-
-  for (let i = 0; i < steps; i++) {
-    const orange = orangeValue - i * step;
-    const bgColor = `rgb(255, ${orange}, 0)`;
-    colorArray.push(bgColor);
-  }
-
-  return colorArray;
-};
-
 function App() {
   const [animations, setAnimations] = useState<React.ReactElement[]>([]);
   const [currentPercentage, setCurrentPercentage] = useState(0);
@@ -94,7 +80,6 @@ function App() {
       <h1 className="relative z-30 text-4xl mb-8 sm:mb-12 text-center font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
         ボタンを連打してアーニャを応援しよう！
       </h1>
-      {/* <Progress value={currentPercentage} /> */}
       <ProgressBar value={currentPercentage} />
       <div id="animation-container">{animations}</div>
       <div className="flex-1 flex flex-col justify-center items-center">

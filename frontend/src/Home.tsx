@@ -91,7 +91,7 @@ function App() {
           アーニャを応援する
         </Button>
       </div>
-      {animations}
+      <div id="animation-container">{animations}</div>
       <ImageSynchronWithPercentage
         value={currentPercentage}
         imageSources={{

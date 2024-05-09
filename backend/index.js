@@ -15,6 +15,7 @@ const io = new Server(httpServer, {
 
 let totalRequests = 0;
 const maxRequests = 100;
+let resetTimer = null;
 
 app.use(express.json());
 app.use(cors());
@@ -26,17 +27,26 @@ app.get("/admin/reset-progress-bar", (req, res) => {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
+  const percentage = Math.floor((totalRequests / maxRequests) * 100);
+  socket.emit("progressUpdate", percentage);
+
   // `play-sound`リクエスト処理をソケットイベントハンドラに移動
   socket.on("play-sound", () => {
     totalRequests++;
 
-    if (totalRequests >= maxRequests) {
-      totalRequests = maxRequests;
-      io.emit("progressUpdate", 100);
-    } else {
-      const percentage = Math.floor((totalRequests / maxRequests) * 100);
-      io.emit("progressUpdate", percentage);
-    }
+    if (totalRequests === maxRequests) {
+        io.emit("progressUpdate", 100);
+  
+        // タイマーをクリアして新しいタイマーを設定
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => {
+          totalRequests = 0;
+          io.emit("progressUpdate", 0);
+        }, 30 * 1000);
+      } else {
+        const percentage = Math.floor((totalRequests / maxRequests) * 100);
+        io.emit("progressUpdate", percentage);
+      }
 
     player
       .play({

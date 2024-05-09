@@ -54,7 +54,7 @@ export const ProgressBar = (props: Props) => {
   };
 
   return (
-    <div className="flex justify-center gap-x-1 sm:gap-4 items-end">
+    <div className="flex justify-center gap-x-1 sm:gap-4 items-end relative z-30">
       {bars.map((bar, i) => {
         const coloredBarLength = (value / 100) * bars.length;
         const isColoredBar = i < coloredBarLength - 1;

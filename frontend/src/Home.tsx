@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import Animate from "./Animate";
+import { ProgressBar } from "./components/ProgressBar";
 
 const socket = io(`${import.meta.env.VITE_SERVER_URL!}`);
 
@@ -32,8 +33,23 @@ function getRandomImage(images: string[]): string {
   return images[randomIndex];
 }
 
+const generateColorArray = (steps: number): string[] => {
+  const colorArray: string[] = [];
+  const orangeValue = 165;
+  const step = Math.floor(orangeValue / (steps - 1));
+
+  for (let i = 0; i < steps; i++) {
+    const orange = orangeValue - i * step;
+    const bgColor = `rgb(255, ${orange}, 0)`;
+    colorArray.push(bgColor);
+  }
+
+  return colorArray;
+};
+
 function App() {
   const [animations, setAnimations] = useState<React.ReactElement[]>([]);
+  const [currentPercentage, setCurrentPercentage] = useState(0);
   const [width, setWidth] = useState(window.innerWidth);
 
   useEffect(() => {
@@ -58,6 +74,10 @@ function App() {
       }
     });
 
+    socket.on("progressUpdate", (currentPercentage) => {
+      setCurrentPercentage(currentPercentage);
+    });
+
     // コンポーネントがアンマウントされるとき、または依存関係が変更された時にイベントリスナーをクリーンアップ
     return () => {
       socket.off("soundPlayed");
@@ -70,10 +90,12 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-8 sm:p-16 overflow-x-hidden bg-[#F4F4F4]">
-      <h1 className="relative z-30 text-4xl mb-4 sm:mb-8 text-center font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
-        Sound Player
+    <div className="min-h-screen flex flex-col py-4 sm:py-8 px-8 sm:px-16 xl:px-32 2xl:px-64 overflow-x-hidden bg-[#F4F4F4]">
+      <h1 className="relative z-30 text-4xl mb-8 sm:mb-12 text-center font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
+        ボタンを連打してアーニャを応援しよう！
       </h1>
+      {/* <Progress value={currentPercentage} /> */}
+      <ProgressBar value={currentPercentage} />
       <div id="animation-container">{animations}</div>
       <div className="flex-1 flex flex-col justify-center items-center">
         <Button

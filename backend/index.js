@@ -13,31 +13,53 @@ const io = new Server(httpServer, {
   },
 });
 
+let totalRequests = 0;
+const maxRequests = 100;
+
 app.use(express.json());
 app.use(cors());
 
-io.on('connection', (socket) => {
-    console.log('A user connected');
-  
-    // `play-sound`リクエスト処理をソケットイベントハンドラに移動
-    socket.on('play-sound', () => {
-      player.play({
-        path: 'sample.wav',
+app.get("/admin/reset-progress-bar", (req, res) => {
+  res.send("Progress bar reset successfully");
+});
+
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  // `play-sound`リクエスト処理をソケットイベントハンドラに移動
+  socket.on("play-sound", () => {
+    totalRequests++;
+
+    if (totalRequests >= maxRequests) {
+      totalRequests = maxRequests;
+      io.emit("progressUpdate", 100);
+    } else {
+      const percentage = Math.floor((totalRequests / maxRequests) * 100);
+      io.emit("progressUpdate", percentage);
+    }
+
+    player
+      .play({
+        path: "sample.wav",
       })
       .then(() => {
-        socket.broadcast.emit('soundPlayed'); // リクエスト元以外にイベントを発行
+        socket.broadcast.emit("soundPlayed"); // リクエスト元以外にイベントを発行
         console.log("Sound played and event broadcasted to other clients");
       })
       .catch((error) => {
         console.error(`Error playing sound: ${error}`);
       });
-    });
-  
-    socket.on('disconnect', () => {
-      console.log('User disconnected');
-    });
   });
 
+  socket.on("reset-progress-bar", () => {
+    totalRequests = 0;
+    io.emit("progressUpdate", 0);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
 
 httpServer.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);

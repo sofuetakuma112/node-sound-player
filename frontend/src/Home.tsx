@@ -8,6 +8,9 @@ import { MaxPercentageImage } from "./components/MaxPercentageImage";
 
 const socket = io(`${import.meta.env.VITE_SERVER_URL!}`);
 
+const USER_NAME = import.meta.env.VITE_USER_NAME!
+const PASSWORD = import.meta.env.VITE_PASSWORD!
+
 const images = [
   "/images/1.webp",
   "/images/2.webp",
@@ -89,7 +92,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ onSuccess }) => {
               </div>
               <button
                 onClick={() => {
-                  if (name === "24fresh" && password === "24fresh") {
+                  if (name === USER_NAME && password === PASSWORD) {
                     onSuccess();
                   }
                 }}
@@ -128,7 +131,7 @@ function App() {
 
   useEffect(() => {
     // イベントリスナーを設定して、soundPlayedイベントが来たらAnimateコンポーネントを追加する
-    socket.on("soundPlayed", () => {
+    socket.on("someoneButtonClicked", () => {
       const animationContainer = document.getElementById("animation-container");
       if (animationContainer && animationContainer.children.length <= 20) {
         setAnimations((prevAnimations) => [

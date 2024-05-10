@@ -17,11 +17,25 @@ const io = new Server(httpServer, {
 const calcCurrentPercentage = (requestsCount) =>
   Math.min(Math.floor((requestsCount / maxRequests) * 100), 100);
 
+const playSound = (socket, fileName) =>
+  player.play({ path: fileName }).then(() => {
+    socket.broadcast.emit("soundPlayed"); // リクエスト元以外にイベントを発行
+    console.log("Sound played and event broadcasted to other clients");
+  });
+
 let totalRequests = 0;
 const maxRequests = 100;
 let resetTimer = null;
 
 let canUpdateProgress = true;
+
+// 各パーセンテージの再生フラグ
+let played5 = false;
+let played20 = false;
+let played40 = false;
+let played60 = false;
+let played80 = false;
+let played100 = false;
 
 app.use(express.json());
 app.use(cors());
@@ -55,7 +69,9 @@ io.on("connection", (socket) => {
 
     totalRequests++;
 
-    if (totalRequests === maxRequests) {
+    const percentage = calcCurrentPercentage(totalRequests);
+
+    if (percentage === 100) {
       io.emit("progressUpdate", 100);
 
       // タイマーをクリアして新しいタイマーを設定
@@ -63,23 +79,37 @@ io.on("connection", (socket) => {
       resetTimer = setTimeout(() => {
         totalRequests = 0;
         io.emit("progressUpdate", 0);
+        // 再生フラグをリセット
+        played20 = false;
+        played40 = false;
+        played60 = false;
+        played80 = false;
+        played100 = false;
       }, 30 * 1000);
     } else {
-      const percentage = calcCurrentPercentage(totalRequests);
       io.emit("progressUpdate", percentage);
     }
 
-    player
-      .play({
-        path: "sample.wav",
-      })
-      .then(() => {
-        socket.broadcast.emit("soundPlayed"); // リクエスト元以外にイベントを発行
-        console.log("Sound played and event broadcasted to other clients");
-      })
-      .catch((error) => {
-        console.error(`Error playing sound: ${error}`);
-      });
+    // パーセンテージに応じて音声ファイルを再生
+    if (percentage >= 5 && !played5) {
+      playSound(socket, "5.m4a");
+      played5 = true;
+    } else if (percentage >= 20 && !played20) {
+      playSound(socket, "20.m4a");
+      played20 = true;
+    } else if (percentage >= 40 && !played40) {
+      playSound(socket, "40.m4a");
+      played40 = true;
+    } else if (percentage >= 60 && !played60) {
+      playSound(socket, "60.m4a");
+      played60 = true;
+    } else if (percentage >= 80 && !played80) {
+      playSound(socket, "80.m4a");
+      played80 = true;
+    } else if (percentage === 100 && !played100) {
+      playSound(socket, "100.m4a");
+      played100 = true;
+    }
   });
 
   socket.on("lock-update-progress", () => {

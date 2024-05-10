@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Animate from "./Animate";
 import { ProgressBar } from "./components/ProgressBar";
 import { ImageSynchronWithPercentage } from "./components/ImageSynchronWithPercentage";
+import { MaxPercentageImage } from "./components/MaxPercentageImage";
 
 const socket = io(`${import.meta.env.VITE_SERVER_URL!}`);
 
@@ -37,7 +38,46 @@ function getRandomImage(images: string[]): string {
 function App() {
   const [animations, setAnimations] = useState<React.ReactElement[]>([]);
   const [currentPercentage, setCurrentPercentage] = useState(0);
+  const [canUpdateProgress, setCanUpdateProgress] = useState(false);
   const [width, setWidth] = useState(window.innerWidth);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get("token");
+
+        const response = await fetch(
+          `${import.meta.env.VITE_SERVER_URL}/api/check-auth${
+            token ? `?token=${encodeURIComponent(token)}` : ""
+          }`,
+          {
+            headers: {
+              Authorization: `Basic ${btoa(
+                `${import.meta.env.VITE_BASIC_AUTH_USERNAME}:${
+                  import.meta.env.VITE_BASIC_AUTH_PASSWORD
+                }`
+              )}`,
+            },
+          }
+        );
+
+        console.log(await response.text());
+
+        if (response.ok) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
@@ -64,10 +104,16 @@ function App() {
     socket.on("progressUpdate", (currentPercentage) => {
       setCurrentPercentage(currentPercentage);
     });
+    socket.on("canUpdateProgress", (canUpdateProgress) => {
+      console.log("canUpdateProgress:", canUpdateProgress);
+      setCanUpdateProgress(canUpdateProgress);
+    });
 
     // コンポーネントがアンマウントされるとき、または依存関係が変更された時にイベントリスナーをクリーンアップ
     return () => {
       socket.off("soundPlayed");
+      socket.off("progressUpdate");
+      socket.off("canUpdateProgress");
     };
   }, [width]);
 
@@ -75,6 +121,10 @@ function App() {
     socket.emit("play-sound"); // サーバーに 'play-sound' イベントを送信
     console.log("Sound play request sent");
   };
+
+  if (!isAuthenticated) {
+    return <div>認証が必要です</div>;
+  }
 
   return (
     <div className="min-h-screen max-h-screen flex flex-col py-4 sm:py-8 px-8 sm:px-16 xl:px-32 2xl:px-64 overflow-x-hidden bg-[#F4F4F4]">
@@ -87,6 +137,7 @@ function App() {
         <Button
           onClick={handlePlaySound}
           className="w-[180px] sm:w-[256px] sm:text-lg relative z-30"
+          disabled={!canUpdateProgress}
         >
           アーニャを応援する
         </Button>
@@ -95,16 +146,15 @@ function App() {
       <ImageSynchronWithPercentage
         value={currentPercentage}
         imageSources={{
-          20: "/images/percentages/20.gif", // 無
-          40: "/images/percentages/40.gif", // トレーニング
-          60: "/images/percentages/60.gif",
-          80: "/images/percentages/80.gif", //
-          100: "/images/percentages/100.gif", // 覚醒
-          120: "/images/percentages/120.gif", // ムキムキ
+          20: "/images/percentages/20.gif", // シャードー
+          40: "/images/percentages/40.gif", // 走り込み
+          60: "/images/percentages/60.gif", // 腹筋
+          80: "/images/percentages/80.gif", // 命をかけた腹筋
+          101: "/images/percentages/100.gif", // 覚醒
+          // 120: "/images/percentages/120.gif", // ムキムキ
         }}
       />
-      {/* <ImageSlider imgSrc="https://img.cdn.nimg.jp/s/nicovideo/thumbnails/42951925/42951925.21906384.original/r1280x720l?key=ced2491820f99a8ec5ecf7a83641887e5071efe2595b931046dcba8dca4cf712" /> */}
-      {/* <div id="animation-container">{animations}</div> */}
+      {currentPercentage >= 100 && <MaxPercentageImage />}
     </div>
   );
 }

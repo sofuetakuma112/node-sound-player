@@ -7,13 +7,32 @@ export const Admin = () => {
   return (
     <div>
       <h1>Admin</h1>
-      <Button
-        onClick={() => {
-          socket.emit("reset-progress-bar");
-        }}
-      >
-        プログレスバーをリセット
-      </Button>
+      <div className="flex flex-col gap-y-2">
+        <Button
+          className="max-w-[240px]"
+          onClick={() => {
+            socket.emit("reset-progress-bar");
+          }}
+        >
+          プログレスバーをリセット
+        </Button>
+        <Button
+          className="max-w-[240px]"
+          onClick={() => {
+            socket.emit("lock-update-progress");
+          }}
+        >
+          プログレスバーを更新不可にする
+        </Button>
+        <Button
+          className="max-w-[240px]"
+          onClick={() => {
+            socket.emit("unlock-update-progress");
+          }}
+        >
+          プログレスバーを更新可能にする
+        </Button>
+      </div>
     </div>
   );
 };

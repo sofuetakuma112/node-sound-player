@@ -22,6 +22,8 @@ const images = [
   "/images/11.webp",
 ];
 
+const cutInAnimeDuration = 2 * 1000;
+
 function getWidthPercentage(currentWidth: number, percentage: number) {
   return (currentWidth * percentage) / 100;
 }
@@ -41,6 +43,10 @@ function App() {
   const [canUpdateProgress, setCanUpdateProgress] = useState(false);
   const [width, setWidth] = useState(window.innerWidth);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [anyaLine, setAnyaLine] = useState<{
+    line: string;
+    soundLength: number;
+  } | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -108,6 +114,12 @@ function App() {
       console.log("canUpdateProgress:", canUpdateProgress);
       setCanUpdateProgress(canUpdateProgress);
     });
+    socket.on("playedAnyaLines", ({ line, soundLength }) => {
+      setAnyaLine({ line, soundLength });
+      setTimeout(() => {
+        setAnyaLine(null);
+      }, 1 * 1000 + soundLength * 1000);
+    });
 
     // コンポーネントがアンマウントされるとき、または依存関係が変更された時にイベントリスナーをクリーンアップ
     return () => {
@@ -154,7 +166,14 @@ function App() {
           // 120: "/images/percentages/120.gif", // ムキムキ
         }}
       />
-      {currentPercentage >= 100 && <MaxPercentageImage />}
+      {currentPercentage >= 100 && (
+        <MaxPercentageImage duration={cutInAnimeDuration} />
+      )}
+      {anyaLine != null && (
+        <div className="w-full px-4 fixed bottom-4 sm:bottom-8 text-black left-1/2 -translate-x-2/4 z-[100] bg-white">
+          <p>{anyaLine.line}</p>
+        </div>
+      )}
     </div>
   );
 }

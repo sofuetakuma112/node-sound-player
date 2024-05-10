@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 
-export const MaxPercentageImage = () => {
+type Props = {
+  duration: number;
+};
+
+export const MaxPercentageImage: React.FC<Props> = ({ duration }) => {
   const [isAnimationFinished, setIsAnimationFinished] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
       setIsAnimationFinished(true);
-    }, 2 * 1000);
-  }, []);
+    }, duration);
+  }, [duration]);
 
   return (
     <div className="absolute h-screen top-0 left-0 w-full flex items-center z-50">

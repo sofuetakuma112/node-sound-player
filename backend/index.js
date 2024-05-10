@@ -80,6 +80,7 @@ io.on("connection", (socket) => {
         totalRequests = 0;
         io.emit("progressUpdate", 0);
         // 再生フラグをリセット
+        played5 = false;
         played20 = false;
         played40 = false;
         played60 = false;
@@ -94,21 +95,49 @@ io.on("connection", (socket) => {
     if (percentage >= 5 && !played5) {
       playSound(socket, "5.m4a");
       played5 = true;
+      io.emit("playedAnyaLines", {
+        line: "アーニャ、筋トレ始める！ ちちとははみたいに強くなりたい！",
+        soundLength: 7,
+      });
     } else if (percentage >= 20 && !played20) {
       playSound(socket, "20.m4a");
       played20 = true;
+      io.emit("playedAnyaLines", {
+        line: "アーニャ頑張る！走り込みもやるます！",
+        soundLength: 5,
+      });
     } else if (percentage >= 40 && !played40) {
       playSound(socket, "40.m4a");
       played40 = true;
+      io.emit("playedAnyaLines", {
+        line: "筋トレ、けっこうきつい... でもアーニャ、あきらめない！",
+        soundLength: 8,
+      });
     } else if (percentage >= 60 && !played60) {
       playSound(socket, "60.m4a");
       played60 = true;
+      io.emit("playedAnyaLines", {
+        line: "わくわく、筋肉ついてきた！ アーニャ、強くなってる！",
+        soundLength: 8,
+      });
     } else if (percentage >= 80 && !played80) {
       playSound(socket, "80.m4a");
       played80 = true;
+      io.emit("playedAnyaLines", {
+        line: "もうアーニャ、ちちもははも越えたかも... スーパーアーニャ、誕生！",
+        soundLength: 8,
+      });
     } else if (percentage === 100 && !played100) {
-      playSound(socket, "100.m4a");
-      played100 = true;
+      setTimeout(() => {
+        playSound(socket, "100.m4a");
+        played100 = true;
+        io.emit("playedAnyaLines", {
+          line: "ニンゲン、捻り潰す...わくわく...",
+          soundLength: 6,
+          isLast: true,
+        });
+        // TODO: モノレポ構成にして、変数をフロントとバックで共有できるようにする
+      }, 2 * 1000); // カットイン演出の時間
     }
   });
 
@@ -124,6 +153,12 @@ io.on("connection", (socket) => {
 
   socket.on("reset-progress-bar", () => {
     totalRequests = 0;
+    played5 = false;
+    played20 = false;
+    played40 = false;
+    played60 = false;
+    played80 = false;
+    played100 = false;
     clearTimeout(resetTimer);
     io.emit("progressUpdate", 0);
   });

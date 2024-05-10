@@ -19,12 +19,11 @@ const calcCurrentPercentage = (requestsCount) =>
 
 const playSound = (socket, fileName) =>
   player.play({ path: fileName }).then(() => {
-    socket.broadcast.emit("soundPlayed"); // リクエスト元以外にイベントを発行
     console.log("Sound played and event broadcasted to other clients");
   });
 
 let totalRequests = 0;
-const maxRequests = 100;
+let maxRequests = 100;
 let resetTimer = null;
 
 let canUpdateProgress = true;
@@ -68,6 +67,7 @@ io.on("connection", (socket) => {
     if (!canUpdateProgress) return;
 
     totalRequests++;
+    socket.broadcast.emit("someoneButtonClicked");
 
     const percentage = calcCurrentPercentage(totalRequests);
 
@@ -134,10 +134,9 @@ io.on("connection", (socket) => {
         io.emit("playedAnyaLines", {
           line: "ニンゲン、捻り潰す...わくわく...",
           soundLength: 6,
-          isLast: true,
         });
         // TODO: モノレポ構成にして、変数をフロントとバックで共有できるようにする
-      }, 2 * 1000); // カットイン演出の時間
+      }, 3 * 1000); // カットイン演出の時間
     }
   });
 
@@ -161,6 +160,15 @@ io.on("connection", (socket) => {
     played100 = false;
     clearTimeout(resetTimer);
     io.emit("progressUpdate", 0);
+  });
+
+  socket.on("update-max-request-count", (newMaxRequests) => {
+    const parsedNewMaxRequests = Number.parseInt(newMaxRequests, 10);
+    if (!Number.isInteger(parsedNewMaxRequests)) {
+      return;
+    }
+
+    maxRequests = parsedNewMaxRequests;
   });
 
   socket.on("disconnect", () => {

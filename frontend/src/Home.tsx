@@ -110,7 +110,6 @@ function App() {
   const [currentPercentage, setCurrentPercentage] = useState(0);
   const [canUpdateProgress, setCanUpdateProgress] = useState(false);
   const [width, setWidth] = useState(window.innerWidth);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [anyaLine, setAnyaLine] = useState<{
     line: string;
     soundLength: number;
@@ -119,43 +118,6 @@ function App() {
   const [hasAuthed, setHasAuthed] = useState(false);
   const handleSuccess = useCallback(() => {
     setHasAuthed(false);
-  }, []);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("token");
-
-        const response = await fetch(
-          `${import.meta.env.VITE_SERVER_URL}/api/check-auth${
-            token ? `?token=${encodeURIComponent(token)}` : ""
-          }`,
-          {
-            headers: {
-              Authorization: `Basic ${btoa(
-                `${import.meta.env.VITE_BASIC_AUTH_USERNAME}:${
-                  import.meta.env.VITE_BASIC_AUTH_PASSWORD
-                }`
-              )}`,
-            },
-          }
-        );
-
-        console.log(await response.text());
-
-        if (response.ok) {
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error("Error checking authentication:", error);
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
   }, []);
 
   useEffect(() => {
@@ -206,10 +168,6 @@ function App() {
     socket.emit("play-sound"); // サーバーに 'play-sound' イベントを送信
     console.log("Sound play request sent");
   };
-
-  if (!isAuthenticated) {
-    return <div>認証が必要です</div>;
-  }
 
   if (!hasAuthed) return <SignInForm onSuccess={handleSuccess} />;
 

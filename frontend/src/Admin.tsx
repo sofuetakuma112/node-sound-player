@@ -1,9 +1,14 @@
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { io } from "socket.io-client";
 
 const socket = io(`${import.meta.env.VITE_SERVER_URL!}`);
 
 export const Admin = () => {
+  // const socket = io("http://localhost:3000");
+  const [maxRequestCount, setMaxRequestCount] = useState<string>("");
+  const [coefficient, setCoefficient] = useState<string>("");
+
   return (
     <div>
       <h1>Admin</h1>
@@ -32,6 +37,38 @@ export const Admin = () => {
         >
           プログレスバーを更新可能にする
         </Button>
+        <div>
+          <input
+            type="text"
+            value={maxRequestCount}
+            onChange={(e) => setMaxRequestCount(e.target.value)}
+            className="border-2"
+          />
+          <Button
+            className="max-w-[240px]"
+            onClick={() => {
+              socket.emit("update-max-request-count", maxRequestCount);
+            }}
+          >
+            Max Requestを変更する
+          </Button>
+        </div>
+        <div>
+          <input
+            type="text"
+            value={coefficient}
+            onChange={(e) => setCoefficient(e.target.value)}
+            className="border-2"
+          />
+          <Button
+            className="max-w-[240px]"
+            onClick={() => {
+              socket.emit("update-coefficient", coefficient);
+            }}
+          >
+            係数を変更する
+          </Button>
+        </div>
       </div>
     </div>
   );

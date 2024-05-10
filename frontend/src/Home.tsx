@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { io } from "socket.io-client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Animate from "./Animate";
 import { ProgressBar } from "./components/ProgressBar";
 import { ImageSynchronWithPercentage } from "./components/ImageSynchronWithPercentage";
@@ -37,6 +37,74 @@ function getRandomImage(images: string[]): string {
   return images[randomIndex];
 }
 
+type SignInFormProps = {
+  onSuccess: () => void;
+};
+
+const SignInForm: React.FC<SignInFormProps> = ({ onSuccess }) => {
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+
+  return (
+    <section className="bg-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <form className="space-y-4 md:space-y-6" action="#">
+              <div>
+                <label
+                  htmlFor="userName"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Username
+                </label>
+                <input
+                  type="userName"
+                  name="userName"
+                  id="userName"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="name@company.com"
+                  required={true}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  placeholder="••••••••"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required={true}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <button
+                onClick={() => {
+                  if (name === "24fresh" && password === "24fresh") {
+                    onSuccess();
+                  }
+                }}
+                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              >
+                ログイン
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 function App() {
   const [animations, setAnimations] = useState<React.ReactElement[]>([]);
   const [currentPercentage, setCurrentPercentage] = useState(0);
@@ -47,6 +115,11 @@ function App() {
     line: string;
     soundLength: number;
   } | null>(null);
+
+  const [hasAuthed, setHasAuthed] = useState(false);
+  const handleSuccess = useCallback(() => {
+    setHasAuthed(false);
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -137,6 +210,8 @@ function App() {
   if (!isAuthenticated) {
     return <div>認証が必要です</div>;
   }
+
+  if (!hasAuthed) return <SignInForm onSuccess={handleSuccess} />;
 
   return (
     <div className="min-h-screen max-h-screen flex flex-col py-4 sm:py-8 px-8 sm:px-16 xl:px-32 2xl:px-64 overflow-x-hidden bg-[#F4F4F4]">
